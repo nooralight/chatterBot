@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chatbot Example</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0-beta3/css/bootstrap.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
+    <style>
+      .chat-box {
+        margin-top: 50px;
+        margin-bottom: 50px;
+      }
+
+      .message-box {
+        height: 400px;
+        overflow-y: auto;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+      }
+
+      .user-message {
+        margin-bottom: 10px;
+        text-align: right;
+      }
+
+      .bot-message {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 offset-md-3 chat-box">
+          <div class="d-flex justify-content-center mt-4 mb-2">
+            <h1>Chat with the Bot</h1>
+          </div>
+          
+          <div class="message-box" id="message-box"></div>
+          <form>
+            <div class="form-floating mb-3">
+              <input type="text" class="form-control" id="user-message" placeholder="Type your message...">
+              <label for="user-message">Message</label>
+              <input type="hidden" class="form-control" id="username" value="{{ username }}">
+              <input type="hidden" class="form-control" id="email" value="{{ email }}">
+            </div>
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-primary">Send</button>
+            </div>
+            
+          </form>
+          <div class="mt-5">
+            <a href="{{ url_for('send_mail' , username=username,email=email) }}">Send your chat to mail</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function() {
+        $('form').on('submit', function(e) {
+          e.preventDefault();
+          var user_message = $('#user-message').val();
+          var username = $('#username').val(); // replace with the actual username
+          var email = $('#email').val(); // replace with the actual email
+          if (user_message !== '') {
+            $('#message-box').append('<div class="user-message">' + user_message + '</div>');
+            $('#user-message').val('');
+            $.ajax({
+              type: "GET",
+              url: "/get/" + username + "/" + email,
+              data: {
+                msg: user_message
+              },
+              success: function(response) {
+                var bot_message = response.replace(/\\n/g, '<br>'); // replace "\n" with "<br>"
+                $('#message-box').append('<div class="bot-message">Bot Reply: ' + bot_message + '</div>');
+              }
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
